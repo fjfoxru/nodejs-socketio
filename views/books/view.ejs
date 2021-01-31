@@ -54,8 +54,6 @@
                 <label for="text">message</label>
                 <textarea placeholder="message" class="form-control" id="text"></textarea>
             </div>
-            <button type="submit" id="send-all" class="btn btn-primary">all</button>
-            <button type="submit" id="send-me" class="btn btn-primary">me</button>
             <button type="submit" id="send-room" class="btn btn-primary">room</button>
         </div>
     </div>
@@ -71,8 +69,6 @@
     const boxList = document.querySelector('#list');
     const inputUsername = document.querySelector('#username');
     const inputText = document.querySelector('#text');
-    const sendAll = document.querySelector('#send-all');
-    const sendMe = document.querySelector('#send-me');
     const sendRoom = document.querySelector('#send-room');
 
     const getTmp = (msg) => {
@@ -86,31 +82,6 @@
                 </div>
         `;
     };
-
-    socket.on('message-to-me', (msg) => {
-        const div = getTmp(msg);
-        boxList.insertAdjacentHTML('beforeend', div);
-    });
-
-    sendMe.addEventListener('click', () => {
-        socket.emit('message-to-me', {
-            username: inputUsername.value,
-            text: inputText.value,
-        });
-    });
-
-
-    socket.on('message-to-all', (msg) => {
-        const div = getTmp(msg);
-        boxList.insertAdjacentHTML('beforeend', div);
-    });
-
-    sendAll.addEventListener('click', () => {
-        socket.emit('message-to-all', {
-            username: inputUsername.value,
-            text: inputText.value,
-        });
-    });
 
 
     socket.on('message-to-room', (msg) => {
