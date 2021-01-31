@@ -23,8 +23,8 @@ const booksRouter = require('./routes/books');
 const userRouter = require('./routes/user');
 
 const app = express();
-const server = http.Server(app);
-const io = socketIO(server);
+const httpServer = http.Server(app);
+const io = socketIO(httpServer);
 
 
 
@@ -37,15 +37,6 @@ app.use(cors());
 app.use(loggerMiddleware);
 
 app.use('/files', express.static(__dirname+'/public'));
-
-
-
-
-/**
- * @param {String} username
- * @param {String} password
- * @param {Function} done
- */
 
 function verify (username, password, done) {
     Users.findByUsername(username, function (err, user) {
@@ -88,19 +79,6 @@ function verify (username, password, done) {
     const {id} = socket;
     console.log(`Socket connected: ${id}`);
 
-    // сообщение себе
-    socket.on('message-to-me', (msg) => {
-        msg.type = 'me';
-        socket.emit('message-to-me', msg);
-    });
-
-    // сообщение для всех
-    socket.on('message-to-all', (msg) => {
-        msg.type = 'all';
-        socket.broadcast.emit('message-to-all', msg);
-        socket.emit('message-to-all', msg);
-    });
-
     // работа с комнатами
     const {roomName} = socket.handshake.query;
     console.log(`Socket roomName: ${roomName}`);
@@ -128,11 +106,10 @@ app.use('/user', userRouter);
 app.use(errorMiddleware);
 
 const PORT = process.env.PORT || 3000;
-server.listen(3030);
 async function start() {
     try {
         await mongoose.connect(UrlDB);
-        app.listen(PORT, () => {
+        httpServer.listen(PORT, () => {
             console.log(`Server is running on port ${PORT}`);
         })
     } catch (e) {
